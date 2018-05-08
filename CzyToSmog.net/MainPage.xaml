@@ -1,0 +1,57 @@
+﻿<Page
+    x:Class="CzyToSmog.net.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CzyToSmog.net"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:Interactions="using:Microsoft.Xaml.Interactions.Core"
+    mc:Ignorable="d"
+    Name="mainPage">
+
+    <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <Button x:Name="refresh" Content="Refresh" Command="{Binding LoadListCommand}" CommandParameter="{x:Bind Path=mainPage}"  RelativePanel.AlignHorizontalCenterWithPanel="True"/>
+        <SplitView RelativePanel.Below="refresh"
+            DisplayMode="Inline"
+            IsPaneOpen="True" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <SplitView.Pane>
+                <ListView x:Name="stationsListListView" ItemsSource="{Binding StationsList}"
+                                                        SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:StationInfoModel">
+                            <StackPanel>
+                                <TextBlock Text="{x:Bind Path=StationName}" FontWeight="Bold">
+                                </TextBlock>
+                                <TextBlock Text="{x:Bind Path=City.Name}" />
+                                <TextBlock Text="{x:Bind Path=Address}" />
+                            </StackPanel>
+
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <Interactivity:Interaction.Behaviors>
+                        <Interactions:EventTriggerBehavior EventName="SelectionChanged">
+                            <Interactions:InvokeCommandAction Command="{Binding LoadSensorsCommand}"  CommandParameter="{x:Bind Path=mainPage}"/>
+                        </Interactions:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </ListView>
+            </SplitView.Pane>
+
+            <ListView x:Name="sensorsListView"  MinHeight="100" ItemsSource="{Binding SensorsList}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:SensorInfoModel">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind Path=Id}" FontWeight="Bold">
+
+                            </TextBlock>
+                            <TextBlock Text="{x:Bind Path=ParamInfo.Name}" />
+                            <TextBlock Text="{x:Bind Path=ParamInfo.Formula}" />
+                        </StackPanel>
+
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </SplitView>
+    </RelativePanel>
+</Page>
