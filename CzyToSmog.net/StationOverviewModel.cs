@@ -88,7 +88,7 @@ namespace CzyToSmog.net
     [DataContract]
     public class SensorParamEntry
     {
-        [DataMember(Name ="paramName")]
+        [DataMember(Name = "paramName")]
         public String Name { get; set; }
 
         [DataMember(Name = "paramFormula")]
@@ -99,5 +99,29 @@ namespace CzyToSmog.net
 
         [DataMember(Name = "idParam")]
         public int Id { get; set; }
+    }
+
+    [DataContract]
+    public class SensorDataInfo
+    {
+        [DataMember(Name = "key")]
+        public String Name { get; set; }
+
+        [DataMember(Name = "values")]
+        public List<SensorDataEntry> Entries { get; set; }
+
+    }
+
+    [DataContract]
+    public class SensorDataEntry
+    {
+        [DataMember(Name = "date")]
+        public String Date { get; set; }
+
+        [DataMember(Name = "value")]
+        public String Value { get; set; }
+
+        [IgnoreDataMember]
+        public String EntryString { get { return $"{this.Value} @ {this.Date}"; } }
     }
 }

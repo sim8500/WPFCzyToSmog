@@ -30,7 +30,7 @@ namespace CzyToSmog.net
         {
             this.InitializeComponent();
 
-            this.DataContext = new MainPageViewModel();
+            this.DataContext = new MainPageViewModel(this.Dispatcher);
 
         }
 

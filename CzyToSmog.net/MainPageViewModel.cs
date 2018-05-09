@@ -14,6 +14,7 @@ using System.Reactive.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Windows.Input;
+using Windows.UI.Core;
 
 namespace CzyToSmog.net
 {
@@ -22,33 +23,70 @@ namespace CzyToSmog.net
         private List<StationInfoModel> _stationsInfoList;
 
         private List<SensorInfoModel> _sensorInfoModels;
+
+        private SensorDataEntry _sensorInfo;
  
         private RelayCommand _listCommand;
 
-        private RelayCommand _detailsCommand;
+        private RelayCommand _sensorsCommand;
 
-        private int _selectedIndex = 0;
+        private RelayCommand _dataCommand;
 
-        public List<StationInfoModel> StationsList {
-                                                        get { return _stationsInfoList; }
-                                                        set { SetProperty(ref _stationsInfoList, value); }
-                                                   }
+        private HttpClient _httpClient;
 
-        public List<SensorInfoModel> SensorsList {
-                                                    get { return _sensorInfoModels; }
-                                                    set { SetProperty(ref _sensorInfoModels, value); }
-                                                 }
+        private CoreDispatcher _dispatcher;
 
-        public int SelectedIndex {
-                                    get { return _selectedIndex; }
-                                    set { SetProperty(ref _selectedIndex, value); }
-                                 }
+        private SensorInfoModel _selectedSensor = null;
+
+        private HttpClient ReqHttpClient
+        {
+            get {
+                if (_httpClient == null)
+                {
+                    _httpClient = new HttpClient
+                    {
+                        BaseAddress = new Uri("http://api.gios.gov.pl/")
+                    };
+
+                    _httpClient.DefaultRequestHeaders.Accept.Clear();
+                    _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+                return _httpClient;
+            }
+        }
+
+        public MainPageViewModel(CoreDispatcher d)
+        {
+            _dispatcher = d;
+        }
+
+        public List<StationInfoModel> StationsList
+        {
+            get { return _stationsInfoList; }
+            set { SetProperty(ref _stationsInfoList, value); }
+        }
+
+        public List<SensorInfoModel> SensorsList
+        {
+           get { return _sensorInfoModels; }
+           set { SetProperty(ref _sensorInfoModels, value); }
+        }
+
+        public SensorDataEntry SensorInfo
+        {
+            get { return _sensorInfo; }
+            set { SetProperty(ref _sensorInfo, value); }
+        }
+
+        public SensorInfoModel SelectedSensor
+        {
+            get { return _selectedSensor; }
+            set { SetProperty(ref _selectedSensor, value); }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public MainPageViewModel()
-        {
-        }
+        #region Commands
 
         public ICommand LoadListCommand
         {
@@ -67,61 +105,36 @@ namespace CzyToSmog.net
         {
             get
             {
-                if (_detailsCommand == null)
+                if (_sensorsCommand == null)
                 {
-                    _detailsCommand = new RelayCommand((page) => LoadStationSensors(page as Page));
+                    _sensorsCommand = new RelayCommand((station) => LoadStationSensors(station as StationInfoModel));
                 }
 
-                return _detailsCommand;
+                return _sensorsCommand;
             }
         }
 
+        public ICommand LoadDataCommand
+        {
+            get
+            {
+                if(_dataCommand == null)
+                {
+                    _dataCommand = new RelayCommand((s) => LoadSensorData(s as SensorInfoModel));
+                }
 
-        /* public void LoadStationsAsync(Page page)
-         {
-             var client = new HttpClient
-             {
-                 BaseAddress = new Uri("http://api.gios.gov.pl/")
-             };
+                return _dataCommand;
+            }
+        }
+    
+        #endregion Commands
 
-             client.DefaultRequestHeaders.Accept.Clear();
-             client.DefaultRequestHeaders.Accept.Add(
-                 new MediaTypeWithQualityHeaderValue("application/json"));
-
-             var katoUrl = "/pjp-api/rest/aqindex/getIndex/814";
-             var glcUrl = "/pjp-api/rest/aqindex/getIndex/809";
-             var krkUrl = "/pjp-api/rest/aqindex/getIndex/400";
-             var serializer = new DataContractJsonSerializer(typeof(StationOverviewModel));
-
-             var queryObservable = System.Reactive.Linq.Observable.Merge(client.GetAsync(katoUrl).ToObservable(),
-                                                                         client.GetAsync(glcUrl).ToObservable(),
-                                                                         client.GetAsync(krkUrl).ToObservable());
-
-             Stations = new List<StationOverviewModel>();
-
-             queryObservable.Select(async r => await r.Content.ReadAsStreamAsync())
-                             .Select(w => serializer.ReadObject(w.Result) as StationOverviewModel)
-                             .Select(s => { return SetStationName(s); })
-                             .Subscribe(async t => {
-                                 Stations.Add(t); },
-                                 async () => await page.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
-                                                                 () => { NotifyPropertyChanged("Stations"); })
-                             );
-
-         }*/
-
+   
         public void LoadListAsync(Page page)
         {
-            var client = new HttpClient
-            {
-                BaseAddress = new Uri("http://api.gios.gov.pl/")
-            };
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var serializer = new DataContractJsonSerializer(typeof(List<StationInfoModel>));
-            var listObservable = client.GetAsync("/pjp-api/rest/station/findAll").ToObservable();
+            var listObservable = ReqHttpClient.GetAsync("/pjp-api/rest/station/findAll").ToObservable();
 
             listObservable.Select(async r => await r.Content.ReadAsStreamAsync())
                             .Select(l => serializer.ReadObject(l.Result) as List<StationInfoModel>)
@@ -130,31 +143,42 @@ namespace CzyToSmog.net
 
         }
 
-        public void LoadStationSensors(Page page)
+        public void LoadStationSensors(StationInfoModel station)
         {
-            var client = new HttpClient
+            if(station == null)
             {
-                BaseAddress = new Uri("http://api.gios.gov.pl/")
-            };
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                return;
+            }
 
             var serializer = new DataContractJsonSerializer(typeof(List<SensorInfoModel>));
-            var item = _stationsInfoList.ElementAt(_selectedIndex);
  
-            var listObservable = client.GetAsync($"/pjp-api/rest/station/sensors/{item.Id}/").ToObservable();
+            var listObservable = ReqHttpClient.GetAsync($"/pjp-api/rest/station/sensors/{station.Id}/").ToObservable();
 
             listObservable.Select(async r => await r.Content.ReadAsStreamAsync())
                             .Select(l => serializer.ReadObject(l.Result) as List<SensorInfoModel>)
-                            .ObserveOn(page.Content.Dispatcher)
-                            .Subscribe(sl => { SensorsList = sl; },
-                                        e => {
+                            .ObserveOn(_dispatcher)
+                            .Subscribe(sl => {
+                                                SensorsList = sl;
+                                                if(SensorsList != null && SensorsList.Count > 0)
+                                                {
+                                                    SelectedSensor = SensorsList.First();
+                                                }
+                                             });
+        }
 
-                                            SensorsList = new List<SensorInfoModel>() {
-                                                                                        new SensorInfoModel { Id = $"error returned: {e.Message}" }
-                                                                                    };
-                                            } );
+        public void LoadSensorData(SensorInfoModel sensor)
+        {
+            if (sensor == null)
+                return;
+
+            var serializer = new DataContractJsonSerializer(typeof(SensorDataInfo));
+
+            var dataObservable = ReqHttpClient.GetAsync($"/pjp-api/rest/data/getData/{sensor.Id}/").ToObservable();
+
+            dataObservable.Select(async r => await r.Content.ReadAsStreamAsync())
+                .Select(l => serializer.ReadObject(l.Result) as SensorDataInfo)
+                .ObserveOn(_dispatcher)
+                .Subscribe(sdi => { SensorInfo = sdi.Entries.First((x) => x.Value != null); });
         }
 
 

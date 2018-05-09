@@ -10,20 +10,16 @@
     mc:Ignorable="d"
     Name="mainPage">
 
-    <RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-        <Button x:Name="refresh" Content="Refresh" Command="{Binding LoadListCommand}" CommandParameter="{x:Bind Path=mainPage}"  RelativePanel.AlignHorizontalCenterWithPanel="True"/>
-        <SplitView RelativePanel.Below="refresh"
+    <Border Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <SplitView
             DisplayMode="Inline"
-            IsPaneOpen="True" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            IsPaneOpen="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <SplitView.Pane>
-                <ListView x:Name="stationsListListView" ItemsSource="{Binding StationsList}"
-                                                        SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                <ListView x:Name="stationsListListView" ItemsSource="{Binding StationsList}">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="local:StationInfoModel">
                             <StackPanel>
-                                <TextBlock Text="{x:Bind Path=StationName}" FontWeight="Bold">
-                                </TextBlock>
+                                <TextBlock Text="{x:Bind Path=StationName}" FontWeight="Bold"/>
                                 <TextBlock Text="{x:Bind Path=City.Name}" />
                                 <TextBlock Text="{x:Bind Path=Address}" />
                             </StackPanel>
@@ -32,26 +28,39 @@
                     </ListView.ItemTemplate>
                     <Interactivity:Interaction.Behaviors>
                         <Interactions:EventTriggerBehavior EventName="SelectionChanged">
-                            <Interactions:InvokeCommandAction Command="{Binding LoadSensorsCommand}"  CommandParameter="{x:Bind Path=mainPage}"/>
+                            <Interactions:InvokeCommandAction Command="{Binding LoadSensorsCommand}" CommandParameter="{Binding SelectedItem, ElementName=stationsListListView}"/>
                         </Interactions:EventTriggerBehavior>
                     </Interactivity:Interaction.Behaviors>
                 </ListView>
             </SplitView.Pane>
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ComboBox x:Name="sensorsComboBox"  SelectedItem="{Binding SelectedSensor, Mode=TwoWay}" MinHeight="100" ItemsSource="{Binding SensorsList}" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="0">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:SensorInfoModel">
 
-            <ListView x:Name="sensorsListView"  MinHeight="100" ItemsSource="{Binding SensorsList}">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="local:SensorInfoModel">
-                        <StackPanel>
-                            <TextBlock Text="{x:Bind Path=Id}" FontWeight="Bold">
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <TextBlock Text="{x:Bind Path=ParamInfo.Formula}" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+                                <TextBlock Text="{x:Bind Path=ParamInfo.Name}" HorizontalAlignment="Stretch" />
+                            </StackPanel>
 
-                            </TextBlock>
-                            <TextBlock Text="{x:Bind Path=ParamInfo.Name}" />
-                            <TextBlock Text="{x:Bind Path=ParamInfo.Formula}" />
-                        </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <Interactivity:Interaction.Behaviors>
+                        <Interactions:EventTriggerBehavior EventName="SelectionChanged">
+                            <Interactions:InvokeCommandAction Command="{Binding LoadDataCommand}"  CommandParameter="{Binding SelectedItem, ElementName=sensorsComboBox}"/>
+                        </Interactions:EventTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </ComboBox>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding SensorInfo.EntryString, Mode=OneWay}" TextWrapping="Wrap" Grid.Row="1"/>
 
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            </Grid>
         </SplitView>
-    </RelativePanel>
+    </Border>
 </Page>
