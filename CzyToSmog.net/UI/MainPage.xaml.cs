@@ -14,10 +14,11 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using CzyToSmog.net.ViewModel;
 
 //Szablon elementu Pusta strona jest udokumentowany na stronie https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x415
 
-namespace CzyToSmog.net
+namespace CzyToSmog.net.UI
 {
     /// <summary>
     /// Pusta strona, która może być używana samodzielnie lub do której można nawigować wewnątrz ramki.
@@ -30,7 +31,7 @@ namespace CzyToSmog.net
         {
             this.InitializeComponent();
 
-            this.DataContext = new MainPageViewModel(this.Dispatcher);
+            this.DataContext = new MainPageViewModel();
 
         }
 
@@ -38,7 +39,7 @@ namespace CzyToSmog.net
         {
             base.OnNavigatedTo(e);
 
-            (this.DataContext as MainPageViewModel)?.LoadListCommand.Execute(this);
+            (this.DataContext as MainPageViewModel).IsBeingNavigated = true;
         }
     }
 }

@@ -14,13 +14,14 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using CzyToSmog.net.UI;
 
 namespace CzyToSmog.net
 {
     /// <summary>
     /// Zapewnia zachowanie specyficzne dla aplikacji, aby uzupełnić domyślną klasę aplikacji.
     /// </summary>
-    sealed partial class App : Application
+    public sealed partial class App : Application
     {
         /// <summary>
         /// Inicjuje pojedynczy obiekt aplikacji. Jest to pierwszy wiersz napisanego kodu
@@ -70,6 +71,16 @@ namespace CzyToSmog.net
                 }
                 // Upewnij się, ze bieżące okno jest aktywne
                 Window.Current.Activate();
+            }
+        }
+
+        public void LoadWeatherPage(string cityName)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            if(rootFrame != null)
+            {
+                rootFrame.Navigate(typeof(WeatherPage), cityName);
             }
         }
 

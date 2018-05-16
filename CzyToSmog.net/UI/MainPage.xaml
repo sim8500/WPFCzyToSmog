@@ -1,8 +1,9 @@
 ﻿<Page
-    x:Class="CzyToSmog.net.MainPage"
+    x:Class="CzyToSmog.net.UI.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:CzyToSmog.net"
+    xmlns:local="using:CzyToSmog.net.UI"
+    xmlns:model="using:CzyToSmog.net.Model"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
@@ -17,7 +18,7 @@
             <SplitView.Pane>
                 <ListView x:Name="stationsListListView" ItemsSource="{Binding StationsList}">
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:StationInfoModel">
+                        <DataTemplate x:DataType="model:StationInfoModel">
                             <StackPanel>
                                 <TextBlock Text="{x:Bind Path=StationName}" FontWeight="Bold"/>
                                 <TextBlock Text="{x:Bind Path=City.Name}" />
@@ -28,7 +29,7 @@
                     </ListView.ItemTemplate>
                     <Interactivity:Interaction.Behaviors>
                         <Interactions:EventTriggerBehavior EventName="SelectionChanged">
-                            <Interactions:InvokeCommandAction Command="{Binding LoadSensorsCommand}" CommandParameter="{Binding SelectedItem, ElementName=stationsListListView}"/>
+                            <Interactions:ChangePropertyAction TargetObject="{Binding}" PropertyName="SelectedStation" Value="{Binding SelectedItem, ElementName=stationsListListView}"/>
                         </Interactions:EventTriggerBehavior>
                     </Interactivity:Interaction.Behaviors>
                 </ListView>
@@ -36,14 +37,17 @@
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <ComboBox x:Name="sensorsComboBox"  SelectedItem="{Binding SelectedSensor, Mode=TwoWay}" MinHeight="100" ItemsSource="{Binding SensorsList}" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="0">
+                <Button x:Name="weatherButton" Content="Go to Weather page!" HorizontalAlignment="Stretch" Grid.Row="0">
+                </Button>
+                <ComboBox x:Name="sensorsComboBox"  SelectedItem="{Binding SelectedSensor, Mode=TwoWay}" MinHeight="100" ItemsSource="{Binding SensorsList}" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="1">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="local:SensorInfoModel">
+                        <DataTemplate x:DataType="model:SensorInfoModel">
 
                             <StackPanel HorizontalAlignment="Stretch">
                                 <TextBlock Text="{x:Bind Path=ParamInfo.Formula}" FontWeight="Bold" HorizontalAlignment="Stretch"/>
@@ -54,11 +58,11 @@
                     </ComboBox.ItemTemplate>
                     <Interactivity:Interaction.Behaviors>
                         <Interactions:EventTriggerBehavior EventName="SelectionChanged">
-                            <Interactions:InvokeCommandAction Command="{Binding LoadDataCommand}"  CommandParameter="{Binding SelectedItem, ElementName=sensorsComboBox}"/>
+                            <Interactions:ChangePropertyAction TargetObject="{Binding}" PropertyName="SelectedSensor" Value="{Binding SelectedItem, ElementName=sensorsComboBox}"/>
                         </Interactions:EventTriggerBehavior>
                     </Interactivity:Interaction.Behaviors>
                 </ComboBox>
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding SensorInfo.EntryString, Mode=OneWay}" TextWrapping="Wrap" Grid.Row="1"/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding SensorData.EntryString, Mode=OneWay}" TextWrapping="Wrap" Grid.Row="2"/>
 
             </Grid>
         </SplitView>

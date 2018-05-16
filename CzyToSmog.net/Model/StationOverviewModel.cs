@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CzyToSmog.net
+namespace CzyToSmog.net.Model
 {
     [DataContract]
     public class StationOverviewModel
