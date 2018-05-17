@@ -63,9 +63,14 @@ namespace CzyToSmog.net.ViewModel
                 .Select(e => e.Value)
                 .InvokeCommand(LoadSensorsCommand);
 
+            this.ObservableForProperty(x => x.SensorsList)
+                .Select(e => e.Value)
+                .Subscribe(x => SelectedSensor = x.FirstOrDefault() );
+                    
             this.ObservableForProperty(x => x.SelectedSensor)
                 .Select(e => e.Value)
                 .InvokeCommand(LoadDataCommand);
+
         }
 
         ObservableAsPropertyHelper<List<StationInfoModel>> _stationsInfoList;
@@ -123,7 +128,9 @@ namespace CzyToSmog.net.ViewModel
 
         public ICommand WeatherPageCommand
         {
-            get; protected set;
+            get;
+
+            set;
    
         }
 
@@ -149,16 +156,16 @@ namespace CzyToSmog.net.ViewModel
 
             var sensors = serializer.ReadObject(stream) as List<SensorInfoModel>;
 
-            if(sensors != null && sensors.Count > 0)
-            {
-                SelectedSensor = sensors.First();
-            }
-
             return sensors;
         }
 
         public async Task<SensorDataEntry> LoadSensorDataAsync(SensorInfoModel sensor)
         {
+            if(sensor == null)
+            {
+                return null;
+            }
+
             var res = await ReqHttpClient.GetAsync($"/pjp-api/rest/data/getData/{sensor.Id}/");
             var stream = await res.Content.ReadAsStreamAsync();
             var serializer = new DataContractJsonSerializer(typeof(SensorDataInfo));
