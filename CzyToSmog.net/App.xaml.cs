@@ -15,6 +15,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using CzyToSmog.net.UI;
+using DryIoc;
+using CzyToSmog.net.Interfaces;
+using CzyToSmog.net.ViewModel;
 
 namespace CzyToSmog.net
 {
@@ -23,12 +26,20 @@ namespace CzyToSmog.net
     /// </summary>
     public sealed partial class App : Application
     {
+
+        private readonly IContainer _container;
+
         /// <summary>
         /// Inicjuje pojedynczy obiekt aplikacji. Jest to pierwszy wiersz napisanego kodu
         /// wykonywanego i jest logicznym odpowiednikiem metod main() lub WinMain().
         /// </summary>
         public App()
         {
+            _container = new Container();
+
+            _container.Register(typeof(IAppNavigation), typeof(AppNavigation), Reuse.Transient);
+            _container.Register(typeof(IMainPageViewModel), typeof(MainPageViewModel), Reuse.Transient);
+            _container.Register(typeof(IWeatherPageViewModel), typeof(WeatherPageViewModel), Reuse.Transient);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }
@@ -64,10 +75,7 @@ namespace CzyToSmog.net
             {
                 if (rootFrame.Content == null)
                 {
-                    // Kiedy stos nawigacji nie jest przywrócony, przejdź do pierwszej strony,
-                    // konfigurując nową stronę przez przekazanie wymaganych informacji jako
-                    // parametr
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    ((IAppNavigation)_container.Resolve<IAppNavigation>()).Navigate<IMainPageViewModel>();
                 }
                 // Upewnij się, ze bieżące okno jest aktywne
                 Window.Current.Activate();

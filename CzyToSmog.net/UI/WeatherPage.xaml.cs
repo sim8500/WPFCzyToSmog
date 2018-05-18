@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,21 +12,17 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using CzyToSmog.net.ViewModel;
-using CzyToSmog.net.Interfaces;
 
-//Szablon elementu Pusta strona jest udokumentowany na stronie https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x415
+// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace CzyToSmog.net.UI
 {
     /// <summary>
-    /// Pusta strona, która może być używana samodzielnie lub do której można nawigować wewnątrz ramki.
+    /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class WeatherPage : Page
     {
-
-
-        public MainPage()
+        public WeatherPage()
         {
             this.InitializeComponent();
         }
@@ -37,10 +31,10 @@ namespace CzyToSmog.net.UI
         {
             base.OnNavigatedTo(e);
 
-            var viewModel = (e.Parameter as IMainPageViewModel);
-            if(viewModel != null)
+            var cityName = (e.Parameter as string);
+            if (cityName != null)
             {
-                viewModel.IsBeingNavigated = true;
+                this.CityName.Text = cityName;
             }
 
         }

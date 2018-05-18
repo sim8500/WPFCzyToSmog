@@ -43,7 +43,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button x:Name="weatherButton" Content="Go to Weather page!" HorizontalAlignment="Stretch" Grid.Row="0">
+                <Button x:Name="weatherButton" Content="Go to Weather page!" Command="{Binding WeatherPageCommand}" HorizontalAlignment="Stretch" Grid.Row="0">
                     <Interactivity:Interaction.Behaviors>
                         <Interactions:EventTriggerBehavior EventName="Click" SourceObject="{Binding ElementName=weatherButton}">
                             <Interactions:NavigateToPageAction TargetPage="weatherPage"/>

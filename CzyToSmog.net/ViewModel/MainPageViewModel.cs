@@ -18,14 +18,17 @@ using Windows.UI.Core;
 using CzyToSmog.net.Model;
 using CzyToSmog.net.UI;
 using ReactiveUI;
-
+using CzyToSmog.net.Interfaces;
 
 namespace CzyToSmog.net.ViewModel
 {
-    public class MainPageViewModel : ReactiveObject
+    public class MainPageViewModel : ReactiveObject, IMainPageViewModel
     {
+        private IAppNavigation _appNav;
 
         private HttpClient _httpClient;
+
+        private StationInfoModel _currentStation;
 
         private HttpClient ReqHttpClient
         {
@@ -44,8 +47,10 @@ namespace CzyToSmog.net.ViewModel
             }
         }
 
-        public MainPageViewModel()
+        public MainPageViewModel(IAppNavigation appNav)
         {
+            _appNav = appNav;
+
             LoadListCommand = ReactiveCommand.CreateFromTask<List<StationInfoModel>>(execute: () => LoadListAsync(), outputScheduler: RxApp.MainThreadScheduler);
             LoadSensorsCommand = ReactiveCommand.CreateFromTask<StationInfoModel, List<SensorInfoModel>>(station => LoadStationSensorsAsync(station), outputScheduler: RxApp.MainThreadScheduler);
             LoadDataCommand = ReactiveCommand.CreateFromTask<SensorInfoModel, SensorDataEntry>(sensor => LoadSensorDataAsync(sensor), outputScheduler: RxApp.MainThreadScheduler);
@@ -126,11 +131,19 @@ namespace CzyToSmog.net.ViewModel
             get; protected set;
         }
 
+        private ReactiveCommand<Unit, Unit> _weatherPageCommand;
+
         public ICommand WeatherPageCommand
         {
-            get;
+            get
+            {
+                if (_weatherPageCommand == null)
+                {
+                    _weatherPageCommand = ReactiveCommand<Unit, Unit>.Create(() => { GoToWeatherPage(); });
+                }
 
-            set;
+                return _weatherPageCommand;
+            }
    
         }
 
@@ -150,6 +163,8 @@ namespace CzyToSmog.net.ViewModel
 
         public async Task<List<SensorInfoModel>> LoadStationSensorsAsync(StationInfoModel station)
         {
+            _currentStation = station;
+
             var res = await ReqHttpClient.GetAsync($"/pjp-api/rest/station/sensors/{station.Id}/");
             var stream = await res.Content.ReadAsStreamAsync();
             var serializer = new DataContractJsonSerializer(typeof(List<SensorInfoModel>));
@@ -175,6 +190,12 @@ namespace CzyToSmog.net.ViewModel
             return model?.Entries.FirstOrDefault(e => e.Value != null);
         }
 
-
+        private void GoToWeatherPage()
+        {
+            if(_currentStation != null)
+            {
+                _appNav.Navigate<IWeatherPageViewModel>(_currentStation.City.Name);
+            }
+        }
     }
 }
