@@ -10,17 +10,44 @@
     xmlns:Interactions="using:Microsoft.Xaml.Interactions.Core"
     mc:Ignorable="d"
     Name="mainPage">
-
+  <Page.Resources>
+    <!--<CollectionViewSource x:Key="StationsAQ" Source="StationsList" Filter="">
+      
+    </CollectionViewSource>-->
+  </Page.Resources>
     <Border Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <SplitView
             DisplayMode="Inline"
             IsPaneOpen="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <SplitView.Pane>
-                <ListView x:Name="stationsListListView" ItemsSource="{Binding StationsList}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Top"  Grid.Row="0">
+                        <Grid.Resources>
+                            <local:BoolToVisConverter x:Key="BoolToVisConverter"/>
+                        </Grid.Resources>
+                        <!-- overlay with hint text -->
+                        <TextBlock x:Name="FilterTextBlock" Margin="5,2" HorizontalAlignment="Stretch"  Foreground="LightSalmon" Visibility="{Binding ElementName=txtSearchBox.Text, Path=IsEmpty, Converter={StaticResource BoolToVisConverter}}" />
+                        <!-- enter term here -->
+                        <TextBox MinWidth="50" Name="txtSearchBox" Background="Transparent">
+                            <Interactivity:Interaction.Behaviors>
+                                <Interactions:EventTriggerBehavior EventName="TextChanged">
+                                    <Interactions:ChangePropertyAction TargetObject="{Binding}" PropertyName="Filter" Value="{Binding Text, ElementName=txtSearchBox}"/>
+                                </Interactions:EventTriggerBehavior>
+                            </Interactivity:Interaction.Behaviors>
+                        </TextBox>
+                    </Grid>
+                    <ListView x:Name="stationsListListView" ItemsSource="{Binding FilteredStationsList}" Grid.Row="1">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="model:StationInfoModel">
                             <StackPanel>
-                                <TextBlock Text="{x:Bind Path=StationName}" FontWeight="Bold"/>
+                                <TextBlock Text="{x:Bind Path=StationName}"  FontWeight="Bold"/>
                                 <TextBlock Text="{x:Bind Path=City.Name}" />
                                 <TextBlock Text="{x:Bind Path=Address}" />
                             </StackPanel>
@@ -33,6 +60,7 @@
                         </Interactions:EventTriggerBehavior>
                     </Interactivity:Interaction.Behaviors>
                 </ListView>
+             </Grid>
             </SplitView.Pane>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -44,11 +72,6 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="weatherButton" Content="Go to Weather page!" Command="{Binding WeatherPageCommand}" HorizontalAlignment="Stretch" Grid.Row="0">
-                    <Interactivity:Interaction.Behaviors>
-                        <Interactions:EventTriggerBehavior EventName="Click" SourceObject="{Binding ElementName=weatherButton}">
-                            <Interactions:NavigateToPageAction TargetPage="weatherPage"/>
-                        </Interactions:EventTriggerBehavior>
-                    </Interactivity:Interaction.Behaviors>
                 </Button>
                 <ComboBox x:Name="sensorsComboBox" ItemsSource="{Binding SensorsList}" SelectedItem="{Binding SelectedSensor, Mode=TwoWay}" MinHeight="100"  HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="1">
                     <ComboBox.ItemTemplate>

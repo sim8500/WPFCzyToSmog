@@ -11,7 +11,7 @@
     <AssemblyName>CzyToSmog.net</AssemblyName>
     <DefaultLanguage>pl-PL</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17134.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -100,6 +100,7 @@
     <Compile Include="Interfaces\IWeatherPageViewModel.cs" />
     <Compile Include="Model\WeatherDataModel.cs" />
     <Compile Include="UI\AppNavigation.cs" />
+    <Compile Include="UI\BoolToVisConverter.cs" />
     <Compile Include="UI\WeatherPage.xaml.cs">
       <DependentUpon>WeatherPage.xaml</DependentUpon>
     </Compile>
@@ -119,14 +120,48 @@
     <None Include="CzyToSmog.net_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties\Default.rd.xml" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\AppIcon.altform-unplated_targetsize-16.png" />
+    <Content Include="Assets\AppIcon.altform-unplated_targetsize-24.png" />
+    <Content Include="Assets\AppIcon.altform-unplated_targetsize-256.png" />
+    <Content Include="Assets\AppIcon.altform-unplated_targetsize-32.png" />
+    <Content Include="Assets\AppIcon.altform-unplated_targetsize-48.png" />
+    <Content Include="Assets\AppIcon.scale-100.png" />
+    <Content Include="Assets\AppIcon.scale-125.png" />
+    <Content Include="Assets\AppIcon.scale-150.png" />
+    <Content Include="Assets\AppIcon.scale-200.png" />
+    <Content Include="Assets\AppIcon.scale-400.png" />
+    <Content Include="Assets\AppIcon.targetsize-16.png" />
+    <Content Include="Assets\AppIcon.targetsize-24.png" />
+    <Content Include="Assets\AppIcon.targetsize-256.png" />
+    <Content Include="Assets\AppIcon.targetsize-32.png" />
+    <Content Include="Assets\AppIcon.targetsize-48.png" />
+    <Content Include="Assets\LargeTile.scale-100.png" />
+    <Content Include="Assets\LargeTile.scale-125.png" />
+    <Content Include="Assets\LargeTile.scale-150.png" />
+    <Content Include="Assets\LargeTile.scale-200.png" />
+    <Content Include="Assets\LargeTile.scale-400.png" />
+    <Content Include="Assets\MediumTile.scale-100.png" />
+    <Content Include="Assets\MediumTile.scale-125.png" />
+    <Content Include="Assets\MediumTile.scale-150.png" />
+    <Content Include="Assets\MediumTile.scale-200.png" />
+    <Content Include="Assets\MediumTile.scale-400.png" />
+    <Content Include="Assets\ras_error.png" />
+    <Content Include="Assets\SmallTile.scale-100.png" />
+    <Content Include="Assets\SmallTile.scale-125.png" />
+    <Content Include="Assets\SmallTile.scale-150.png" />
+    <Content Include="Assets\SmallTile.scale-200.png" />
+    <Content Include="Assets\SmallTile.scale-400.png" />
+    <Content Include="Assets\SplashScreen.scale-100.png" />
+    <Content Include="Assets\SplashScreen.scale-125.png" />
+    <Content Include="Assets\SplashScreen.scale-150.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\SplashScreen.scale-400.png" />
+    <Content Include="Assets\WideTile.scale-100.png" />
+    <Content Include="Assets\WideTile.scale-125.png" />
+    <Content Include="Assets\WideTile.scale-150.png" />
+    <Content Include="Assets\WideTile.scale-200.png" />
+    <Content Include="Assets\WideTile.scale-400.png" />
+    <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

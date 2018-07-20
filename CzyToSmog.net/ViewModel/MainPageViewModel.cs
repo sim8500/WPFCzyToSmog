@@ -59,7 +59,6 @@ namespace CzyToSmog.net.ViewModel
             _sensorInfoModels = LoadSensorsCommand.ToProperty(this, x => x.SensorsList, new List<SensorInfoModel>());
             _sensorData = LoadDataCommand.ToProperty(this, x => x.SensorData, new SensorDataEntry());
 
-
             this.ObservableForProperty(x => x.IsBeingNavigated)
                 .Select(e => new Unit())
                 .InvokeCommand(LoadListCommand);
@@ -76,19 +75,40 @@ namespace CzyToSmog.net.ViewModel
                 .Select(e => e.Value)
                 .InvokeCommand(LoadDataCommand);
 
+
+           _filteredStationsInfoList = this.WhenAnyValue( 
+                                                         x => x.Filter,
+                                                         x => x.StationsList,
+                                                         (f,l) => l.CreateDerivedCollection(x => x, 
+                                                                                            x => x.StationName.Contains(string.IsNullOrEmpty(f) ? "" : f)
+                                                                                           ).ToList()
+                                                        )
+                                                        .ToProperty(this, x => x.FilteredStationsList, new List<StationInfoModel>());
+
         }
 
         ObservableAsPropertyHelper<List<StationInfoModel>> _stationsInfoList;
+        ObservableAsPropertyHelper<List<StationInfoModel>> _filteredStationsInfoList;
 
         ObservableAsPropertyHelper<List<SensorInfoModel>> _sensorInfoModels;
 
         ObservableAsPropertyHelper<SensorDataEntry> _sensorData;
 
-        public List<StationInfoModel> StationsList => _stationsInfoList.Value;
+        public List<StationInfoModel> StationsList { get { return _stationsInfoList.Value;  } }
+
+        public List<StationInfoModel> FilteredStationsList => _filteredStationsInfoList.Value;
+               
 
         public List<SensorInfoModel> SensorsList => _sensorInfoModels.Value;
 
         public SensorDataEntry SensorData => _sensorData.Value;
+
+        private string _filter;
+        public string Filter
+        {
+            get { return _filter; }
+            set { this.RaiseAndSetIfChanged(ref _filter, value); }
+        }
 
         bool _isBeingNavigated = false;
 
@@ -189,6 +209,7 @@ namespace CzyToSmog.net.ViewModel
 
             return model?.Entries.FirstOrDefault(e => e.Value != null);
         }
+
 
         private void GoToWeatherPage()
         {
