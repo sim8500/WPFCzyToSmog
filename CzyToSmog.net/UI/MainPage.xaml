@@ -11,9 +11,6 @@
     mc:Ignorable="d"
     Name="mainPage">
   <Page.Resources>
-    <!--<CollectionViewSource x:Key="StationsAQ" Source="StationsList" Filter="">
-      
-    </CollectionViewSource>-->
   </Page.Resources>
     <Border Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <SplitView

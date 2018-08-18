@@ -69,7 +69,7 @@ namespace CzyToSmog.net.ViewModel
 
             this.ObservableForProperty(x => x.SensorsList)
                 .Select(e => e.Value)
-                .Subscribe(x => SelectedSensor = x.FirstOrDefault() );
+                .Subscribe(x => SelectedSensor = x?.FirstOrDefault() );
                     
             this.ObservableForProperty(x => x.SelectedSensor)
                 .Select(e => e.Value)
@@ -184,6 +184,10 @@ namespace CzyToSmog.net.ViewModel
         public async Task<List<SensorInfoModel>> LoadStationSensorsAsync(StationInfoModel station)
         {
             _currentStation = station;
+            if(_currentStation == null)
+            {
+                return null;
+            }
 
             var res = await ReqHttpClient.GetAsync($"/pjp-api/rest/station/sensors/{station.Id}/");
             var stream = await res.Content.ReadAsStreamAsync();
